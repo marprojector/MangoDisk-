@@ -1,0 +1,55 @@
+id = "browser.edge-cache"
+schema_version = 3
+rule_version = 2
+platform = "macos"
+category = "browser"
+risk = "safe"
+default_selected = true
+required_stopped_processes = ["Microsoft Edge"]
+
+[[applicability]]
+kind = "anyOf"
+items = [
+  { kind = "applicationInstalled", identifiers = ["Microsoft Edge", "Microsoft Edge Update"] },
+  { kind = "anyRootExists" },
+]
+
+[[roots]]
+template = "${user_library}/Caches/Microsoft Edge"
+
+[[roots]]
+template = "${application_support}/Microsoft Edge/ShaderCache"
+
+[[roots]]
+template = "${application_support}/Microsoft Edge/GrShaderCache"
+
+[[roots]]
+template = "${application_support}/Microsoft Edge/GraphiteDawnCache"
+
+[[roots]]
+template = "${application_support}/Microsoft Edge/GPUPersistentCache"
+
+[[roots]]
+template = "${application_support}/Microsoft Edge"
+kind = "childDirectories"
+child_names = ["Default", "Guest Profile", "System Profile"]
+child_prefixes = ["Profile "]
+suffixes = ["Cache", "Code Cache", "GPUCache", "DawnCache", "GrShaderCache", "DawnWebGPUCache", "DawnGraphiteCache"]
+
+[matcher]
+kind = "all"
+
+[execution]
+kind = "deleteMatchingContents"
+requires_app_close = true
+
+[verification]
+lifecycle = "verified"
+evidence = "Official Chromium sources identify disposable cache leaves. Isolated scan, dry-run, deletion, and preservation tests cover these roots; credentials, history, extensions, and site storage are excluded."
+verified_at = "2026-10-20"
+verified_platform = "macos"
+references = [
+  "https://learn.microsoft.com/en-us/deployedge/microsoft-edge-policies/userdatadir",
+  "https://chromium.googlesource.com/chromium/src/+/main/chrome/browser/chrome_content_browser_client.cc",
+  "https://chromium.googlesource.com/chromium/src/+/main/gpu/ipc/common/gpu_disk_cache_type.cc",
+]
